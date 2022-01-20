@@ -1,4 +1,4 @@
-import { IContext } from './../context';
+import { IContext } from './../../models';
 import { objectType, extendType } from 'nexus';
 
 export const User = objectType({

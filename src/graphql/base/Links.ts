@@ -1,5 +1,5 @@
 import { extendType, nonNull, objectType, stringArg, intArg } from 'nexus';
-import { IContext } from '../context';
+import { IContext } from './../../models';
 
 export const Link = objectType({
   name: 'Link',

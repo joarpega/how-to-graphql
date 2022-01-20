@@ -1,13 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Request } from 'express';
-import { decodeAuthHeader } from './utils/auth';
+import { IContext } from './models';
+import { decodeAuthHeader } from './utils/auth/auth';
 
 export const prisma = new PrismaClient();
-
-export interface IContext {
-  prisma: PrismaClient;
-  userId?: number;
-}
 
 export const context = ({ req }: { req: Request }): IContext => {
   const token =

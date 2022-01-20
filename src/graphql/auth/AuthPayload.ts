@@ -1,8 +1,8 @@
-import { IContext } from './../../context';
+import { IContext } from './../../models';
 import { objectType, extendType, nonNull, stringArg, arg } from 'nexus';
 import { compare, hash } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
-import { APP_SECRET } from './../../utils/auth';
+import { APP_SECRET } from '../../utils/auth/auth';
 
 export const AuthPayload = objectType({
   name: 'AuthPayload',

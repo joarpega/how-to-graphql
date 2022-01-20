@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: "Some" # set your default password
+      POSTGRES_USER: "admin" # Set your default user
+    volumes: # Optional can comment
+      - ./../../contenedor/data/:/var/lib/postgresql/data # Optional can comment or set your local folder
+      - ./../../contenedor/backup/:/home # Optional can comment or set your local folder
+    
