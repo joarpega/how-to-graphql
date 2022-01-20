@@ -30,3 +30,6 @@ touch tsconfig.json
 ```bash
 npm install apollo-server graphql nexus
 ```
+
+
+Step: Implementing the signup and login mutation

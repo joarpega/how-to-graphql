@@ -2,11 +2,25 @@ import { extendType, nonNull, objectType, stringArg, intArg } from 'nexus';
 import { IContext } from '../context';
 
 export const Link = objectType({
-  name: 'Link', // <- Name of your type
+  name: 'Link',
+  description: 'Model link',
   definition(t) {
-    t.nonNull.int('id');
-    t.nonNull.string('description');
-    t.nonNull.string('url');
+    t.nonNull.int('id', { description: 'Id link' });
+    t.nonNull.string('description', { description: 'Description link' });
+    t.nonNull.string('url', { description: 'Url link' });
+    t.field('postedBy', {
+      type: 'User',
+      description: 'Posted By',
+      resolve(parent, args, context: IContext) {
+        return context.prisma.link
+          .findUnique({
+            where: {
+              id: parent.id,
+            },
+          })
+          .postedBy();
+      },
+    });
   },
 });
 
@@ -16,6 +30,7 @@ export const LinkQuery = extendType({
   definition(t) {
     t.nonNull.list.nonNull.field('feed', {
       type: 'Link',
+      description: 'Links type',
       resolve(parent, args, context: IContext, info) {
         return context.prisma.link.findMany();
       },
@@ -58,10 +73,17 @@ export const LinkMutation = extendType({
       },
       resolve(parent, args, context: IContext, info) {
         const { url, description } = args;
+        const { userId } = context;
+
+        if (!userId) {
+          throw new Error('Can´t pot wothout logging in.');
+        }
 
         const newLink = context.prisma.link.create({
           data: {
-            ...args,
+            description,
+            url,
+            postedBy: { connect: { id: userId } },
           },
         });
 
