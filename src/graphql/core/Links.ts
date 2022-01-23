@@ -1,4 +1,15 @@
-import { extendType, nonNull, objectType, stringArg, intArg } from 'nexus';
+import { Prisma } from '@prisma/client';
+import {
+  extendType,
+  nonNull,
+  objectType,
+  stringArg,
+  intArg,
+  inputObjectType,
+  enumType,
+  list,
+  arg,
+} from 'nexus';
 import { IContext } from './../../models';
 
 export const Link = objectType({
@@ -27,8 +38,47 @@ export const Link = objectType({
     t.nonNull.list.nonNull.field('voters', {
       type: 'User',
       resolve(parent, args, context: IContext) {
-        return context.prisma.link.findUnique({ where: { id: parent.id } }).voters();
+        return context.prisma.link
+          .findUnique({ where: { id: parent.id } })
+          .voters();
       },
+    });
+  },
+});
+
+/** Represent the criterial by wich that the list of Link elements can be sorted */
+export const LinkOrderByInput = inputObjectType({
+  name: 'LinkOrderByInput',
+  description: 'Input to element sorting, acording to specific criterial',
+  definition(t) {
+    t.field('description', {
+      type: Sort,
+      description: 'Sort option by description field [asc/desc]',
+    });
+    t.field('url', {
+      type: Sort,
+      description: 'Sort option by url field [asc/desc]',
+    });
+    t.field('createdAt', { type: Sort, description: 'Created at' });
+  },
+});
+
+export const Sort = enumType({
+  name: 'Sort',
+  members: ['asc', 'desc'],
+});
+
+export const Feed = objectType({
+  name: 'Feed',
+  description: 'Feed type use as return type of the feed query',
+  definition(t) {
+    t.nonNull.list.nonNull.field('links', {
+      type: Link,
+      description: 'Array of link type objects',
+    });
+    t.nonNull.int('count', {
+      description:
+        'Is an integer that will mention number of links available in the database that match',
     });
   },
 });
@@ -37,11 +87,48 @@ export const Link = objectType({
 export const LinkQuery = extendType({
   type: 'Query',
   definition(t) {
-    t.nonNull.list.nonNull.field('feed', {
-      type: 'Link',
+    t.nonNull.field('feed', {
+      type: 'Feed',
       description: 'Links type',
-      resolve(parent, args, context: IContext, info) {
-        return context.prisma.link.findMany();
+      args: {
+        filter: stringArg({
+          description: 'Serarch string on fields URL or Description',
+        }),
+        skip: intArg({ description: 'Offset pagination use' }),
+        take: intArg({
+          description: 'Select a limit range and return records',
+        }),
+        orderBy: arg({
+          type: list(nonNull(LinkOrderByInput)),
+          description:
+            'Represent the criterial by wich that the list of Link elements can be sorted',
+        }),
+      },
+      async resolve(parent, args, context: IContext, info) {
+        const where = args.filter
+          ? {
+              OR: [
+                { description: { contains: args.filter } },
+                { url: { contains: args.filter } },
+              ],
+            }
+          : {};
+
+        /** In prisma undefinend means do nothing, null is a specific value. */
+        const links = await context.prisma.link.findMany({
+          where,
+          skip: args?.skip as number | undefined,
+          take: args?.take as number | undefined,
+          orderBy: args?.orderBy as
+            | Prisma.Enumerable<Prisma.LinkOrderByWithRelationInput>
+            | undefined,
+        });
+        const count = await context.prisma.link.count({ where });
+
+        return {
+          links,
+          count,
+        };
       },
     });
   },

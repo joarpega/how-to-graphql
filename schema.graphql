@@ -16,6 +16,17 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+"""Feed type use as return type of the feed query"""
+type Feed {
+  """
+  Is an integer that will mention number of links available in the database that match
+  """
+  count: Int!
+
+  """Array of link type objects"""
+  links: [Link!]!
+}
+
 """Model link"""
 type Link {
   """Create at"""
@@ -33,6 +44,18 @@ type Link {
   """Url link"""
   url: String!
   voters: [User!]!
+}
+
+"""Input to element sorting, acording to specific criterial"""
+input LinkOrderByInput {
+  """Created at"""
+  createdAt: Sort
+
+  """Sort option by description field [asc/desc]"""
+  description: Sort
+
+  """Sort option by url field [asc/desc]"""
+  url: Sort
 }
 
 type Mutation {
@@ -65,8 +88,27 @@ type Mutation {
 
 type Query {
   """Links type"""
-  feed: [Link!]!
+  feed(
+    """Serarch string on fields URL or Description"""
+    filter: String
+
+    """
+    Represent the criterial by wich that the list of Link elements can be sorted
+    """
+    orderBy: [LinkOrderByInput!]
+
+    """Offset pagination use"""
+    skip: Int
+
+    """Select a limit range and return records"""
+    take: Int
+  ): Feed!
   link(id: Int!): Link
+}
+
+enum Sort {
+  asc
+  desc
 }
 
 """User model"""
