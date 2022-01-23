@@ -21,6 +21,7 @@ export const AuthMutation = extendType({
   definition(t) {
     t.nonNull.field('login', {
       type: 'AuthPayload',
+      description: 'Login method - obtains jwt for use in next request',
       args: {
         email: nonNull(stringArg({ description: 'Unique email' })),
         password: nonNull(stringArg({ description: 'User password' })),

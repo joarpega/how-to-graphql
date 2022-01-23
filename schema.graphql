@@ -11,8 +11,16 @@ type AuthPayload {
   user: User
 }
 
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
 """Model link"""
 type Link {
+  """Create at"""
+  createdAt: DateTime!
+
   """Description link"""
   description: String!
 
@@ -24,10 +32,13 @@ type Link {
 
   """Url link"""
   url: String!
+  voters: [User!]!
 }
 
 type Mutation {
   deleteLink(id: Int!): Link
+
+  """Login method - obtains jwt for use in next request"""
   login(
     """Unique email"""
     email: String!
@@ -47,6 +58,9 @@ type Mutation {
     password: String!
   ): AuthPayload!
   updateLink(description: String!, id: Int!, url: String!): Link
+
+  """Create vote"""
+  vote(linkId: Int!): Vote
 }
 
 type Query {
@@ -63,4 +77,14 @@ type User {
   """List links"""
   links: [Link!]!
   name: String!
+  votes: [Link!]!
+}
+
+"""Vote model"""
+type Vote {
+  """Link id"""
+  link: Link!
+
+  """User id"""
+  user: User!
 }
