@@ -2,13 +2,18 @@
   "compilerOptions": {
     "target": "ES2018",
     "module": "commonjs",
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "strict": true,
     "rootDir": ".",
     "outDir": "dist",
     "sourceMap": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "removeComments": true,
+    /* Advanced Options */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "exclude": ["__test__"]
 }

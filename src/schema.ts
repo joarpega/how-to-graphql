@@ -2,14 +2,31 @@ import { makeSchema } from 'nexus';
 import { join } from 'path';
 import * as types from './graphql'; // 1
 
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+const isContainer = process.env.APP_COMPILE_CONTAINER === 'true';
+
+let nexusPath = '';
+let contextPath = '';
+
+if (isContainer) {
+  nexusPath = join(__dirname, '..', 'nexus-typegen.js')
+  contextPath = join(__dirname, './context.js')
+} else {
+  nexusPath = join(__dirname, '..', 'nexus-typegen.ts');
+  contextPath = join(__dirname, './context.ts');
+}
+
 export const schema = makeSchema({
-  types, // 2
+  types,
   outputs: {
-    schema: join(__dirname, '..', 'schema.graphql'), // 2
-    typegen: join(__dirname, '..', 'nexus-typegen.ts'), // 3
+    typegen: nexusPath,
+    schema: join(__dirname, '..', 'schema.graphql'),
   },
   contextType: {
-    module: join(__dirname, './context.ts'),
+    module: contextPath,
     export: 'Context',
   },
 });

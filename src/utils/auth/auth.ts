@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken";
 
-export const APP_SECRET = "GraphQL-is-aw3some";
+export const APP_SECRET = `${process.env.APP_SECRET}`;
 
 export interface AuthTokenPayload {
   userId: number;
